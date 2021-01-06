@@ -10,6 +10,18 @@ public class StageUIManager : BaseUIManager
         stageText.text = $"ステージ：{currentStage + 1}";
     }
 
+    public void ShowButton()
+    {
+        ShowNextButton(true);
+        ShowReturnButton(true);
+    }
+
+    public void HideButton()
+    {
+        ShowNextButton(false);
+        ShowReturnButton(false);
+    }
+
     protected override void ExecMoveModeAction()
     {
         ShowUI(true);
@@ -22,14 +34,24 @@ public class StageUIManager : BaseUIManager
 
     protected override void ExecStageCompleteModeAction()
     {
-        ShowUI(false);
-        stageText.gameObject.SetActive(false);
+        ShowNextButton(false);
+        ShowReturnButton(true);
     }
 
     private void ShowUI(bool isShown)
     {
+        ShowNextButton(isShown);
+        ShowReturnButton(isShown);
+    }
+
+    private void ShowNextButton(bool isShown)
+    {
         var nextButton = transform.Find("NextButton").gameObject;
         nextButton.SetActive(isShown);
+    }
+
+    private void ShowReturnButton(bool isShown)
+    {
         var returnButton = transform.Find("ReturnButton").gameObject;
         returnButton.SetActive(isShown);
     }

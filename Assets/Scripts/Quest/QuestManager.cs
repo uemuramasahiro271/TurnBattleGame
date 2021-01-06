@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class QuestManager : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class QuestManager : MonoBehaviour
     [SerializeField] StageCompleteUIManager stageCompleteUI;
     [SerializeField] GameModeManager gameModeManager;
     [SerializeField] BattleManager battleManager;
+    [SerializeField] GameObject questBG;
 
     //[SerializeField] GameObject enemyPrefab1;
     //[SerializeField] GameObject enemyPrefab2;
@@ -23,7 +25,7 @@ public class QuestManager : MonoBehaviour
         stageUI.UpdateUI(currentStage);
 
         stageUI.Setup(gameModeManager);
-        playerUI.Setup(gameModeManager);
+        //playerUI.Setup(gameModeManager);
         enemyUI.Setup(gameModeManager);
         stageCompleteUI.Setup(gameModeManager);
 
@@ -32,23 +34,17 @@ public class QuestManager : MonoBehaviour
 
     public void OnNextButtonClick()
     {
-        currentStage++;
+        SountdManager.instance.PlaySE(0);
 
-        stageUI.UpdateUI(currentStage);
+        stageUI.HideButton();
 
-        if(maxStageCount <= currentStage)
-        {
-            QuestClear();
-            return;
-        }
-
-        int num = CreateRandomNum();
-        EncountEnemy(num);
-
+        StartCoroutine(Searching());
     }
 
     public void OnReturnButtonClick()
     {
+        SountdManager.instance.PlaySE(0);
+
         currentStage = 0;
 
         stageUI.UpdateUI(currentStage);
@@ -57,6 +53,32 @@ public class QuestManager : MonoBehaviour
     public void EndBattle()
     {
         gameModeManager.SwitchMode(GameMode.Move);
+    }
+
+    private IEnumerator Searching()
+    {
+        questBG.transform.DOScale(new Vector3(1.5f, 1.5f, 1.5f), 2f)
+            .OnComplete(() => questBG.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f));
+
+        var questBGSpriteRenderer = questBG.GetComponent<SpriteRenderer>();
+        questBGSpriteRenderer.DOFade(0, 2f)
+            .OnComplete(() => questBGSpriteRenderer.DOFade(1, 0));
+
+        yield return new WaitForSeconds(2f);
+
+        currentStage++;
+
+        if (maxStageCount <= currentStage)
+        {
+            QuestClear();
+        }
+        else
+        {
+            stageUI.UpdateUI(currentStage);
+
+            int num = CreateRandomNum();
+            EncountEnemy(num);
+        }
     }
 
     private int CreateRandomNum()
@@ -74,6 +96,10 @@ public class QuestManager : MonoBehaviour
             gameModeManager.SwitchMode(GameMode.Battle);
             var enemy = enemyObj.GetComponent<EnemyManager>();
             battleManager.Setup(enemy);
+        }
+        else
+        {
+            stageUI.ShowButton();
         }
     }
 
@@ -94,8 +120,8 @@ public class QuestManager : MonoBehaviour
 
     private void QuestClear()
     {
-        //var sceneTransitionManager = Instantiate((SceneTransitionManager)Resources.Load("Prefabs/SceneManager"));
-        //sceneTransitionManager.LoadTo("Town");
+        SountdManager.instance.StopBGM();
+        SountdManager.instance.PlaySE(3);
 
         gameModeManager.SwitchMode(GameMode.StageComplete);
     }

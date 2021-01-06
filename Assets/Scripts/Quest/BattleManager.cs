@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
+using DG.Tweening;
 
 public class BattleManager : MonoBehaviour
 {
+    [SerializeField] Transform playerDamageObj;
     [SerializeField] PlayerUIManager playerUI;
     [SerializeField] EnemyUIManager enemyUI;
     [SerializeField] PlayerManager player;
@@ -23,6 +26,8 @@ public class BattleManager : MonoBehaviour
 
     public void Setup(EnemyManager enemyManager)
     {
+        SountdManager.instance.PlayBGM("Battle");
+
         playerUI.SetupUI(player);
         enemy = enemyManager;
         enemyUI.SetupUI(enemy);
@@ -32,29 +37,40 @@ public class BattleManager : MonoBehaviour
 
     private void PlayerAttack()
     {
+        StopAllCoroutines();
+
+        SountdManager.instance.PlaySE(1);
+
         player.Attack(enemy);
         enemyUI.UpdateUI(enemy);
 
         if(enemy.hp == 0)
         {
-            Destroy(enemy.gameObject);
-            EndBattle();
+            StartCoroutine(EndBattle());
         }
         else
         {
-            EnemyTurn();
+            StartCoroutine(EnemyTurn());
         }
     }
 
-    private void EnemyTurn()
+    private IEnumerator EnemyTurn()
     {
+        yield return new WaitForSeconds(1f);
+
+        SountdManager.instance.PlaySE(1);
+
+        playerDamageObj.DOShakePosition(0.3f, 0.5f, 20, 0, false, true);
         enemy.Attack(player);
         playerUI.UpdateUI(player);
     }
 
-    private void EndBattle()
+    private IEnumerator EndBattle()
     {
-        Debug.Log("バトル終了");
+        yield return new WaitForSeconds(1f);
+
+        Destroy(enemy.gameObject);
+        SountdManager.instance.PlayBGM("Quest");
         endBattleAction();
     }
 

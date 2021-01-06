@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class StageCompleteUIManager : BaseUIManager
 {
-    [SerializeField] Text completeText;
-
     protected override void ExecMoveModeAction()
     {
         ShowUI(false);
@@ -24,6 +22,6 @@ public class StageCompleteUIManager : BaseUIManager
 
     private void ShowUI(bool isShown)
     {
-        completeText.gameObject.SetActive(isShown);
+        gameObject.SetActive(isShown);
     }
 }

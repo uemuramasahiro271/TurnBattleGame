@@ -10,7 +10,7 @@ public class EnemyUIManager : BaseUIManager
 
     public void SetupUI(EnemyManager enemy)
     {
-        nameText.text = $"名前：{enemy.name}";
+        nameText.text = enemy.name;
         hpText.text = $"HP：{enemy.hp}";
     }
 
@@ -35,7 +35,9 @@ public class EnemyUIManager : BaseUIManager
 
     private void ShowUI(bool isShown)
     {
-        nameText.gameObject.SetActive(isShown);
-        hpText.gameObject.SetActive(isShown);
+        //nameText.gameObject.SetActive(isShown);
+        //hpText.gameObject.SetActive(isShown);
+
+        gameObject.SetActive(isShown);
     }
 }
